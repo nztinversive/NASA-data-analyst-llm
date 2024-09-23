@@ -92,13 +92,13 @@ document.addEventListener('DOMContentLoaded', function() {
         });
 
         // Add event listener for button clicks
-        document.querySelectorAll('.updatemenu-button').forEach((button, index) => {
-            button.addEventListener('click', () => {
+        parsedChartData[0].layout.updatemenus[0].buttons.forEach((button, index) => {
+            button.click = function() {
                 Plotly.update('chart', 
-                    parsedChartData.map(chart => chart.data.map(trace => ({visible: index === parsedChartData.indexOf(chart)}))).flat(),
-                    {title: parsedChartData[index].layout.title}
+                    {'visible': button.args[0].visible},
+                    {'title': button.args[1].title}
                 );
-            });
+            };
         });
 
         // Make the chart responsive
@@ -114,10 +114,10 @@ document.addEventListener('DOMContentLoaded', function() {
         resizeChart();
 
         // Add color customization
-        addColorCustomization();
+        addColorCustomization(parsedChartData);
     }
 
-    function addColorCustomization() {
+    function addColorCustomization(parsedChartData) {
         const colorSchemes = {
             'Default': {'Completed': '#1f77b4', 'Ongoing': '#ff7f0e'},
             'High Contrast': {'Completed': '#000000', 'Ongoing': '#ff0000'},
@@ -146,7 +146,7 @@ document.addEventListener('DOMContentLoaded', function() {
         colorSchemeSelect.addEventListener('change', function() {
             const selectedScheme = colorSchemes[this.value];
             Plotly.restyle('chart', {
-                'marker.color': [Object.values(selectedScheme)]
+                'marker.color': [parsedChartData[0].data.map(trace => selectedScheme[trace.name] || trace.marker.color)]
             });
         });
     }

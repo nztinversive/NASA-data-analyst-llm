@@ -43,7 +43,7 @@ def process_query(query: str) -> Union[List, Dict]:
         elif 'status' in query.lower():
             result = df['Status'].tolist()
         else:
-            result = json.loads(df.to_json(orient='records'))
+            result = df.to_dict(orient='records')
         
         # Create visualizations
         figs = []
@@ -163,7 +163,6 @@ def process_query(query: str) -> Union[List, Dict]:
                 updatemenus=updatemenus
             )
         
-        result = json.loads(json.dumps(result, default=serialize_numpy))
         chart_json = json.dumps([fig.to_dict() for fig in figs], default=serialize_numpy)
         
         return {'data': result, 'chart': chart_json}
