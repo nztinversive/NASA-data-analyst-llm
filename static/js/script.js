@@ -80,7 +80,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const layout = {
             ...parsedChartData.layout,
             autosize: true,
-            margin: { l: 50, r: 50, b: 50, t: 50, pad: 4 }
+            margin: { l: 30, r: 30, b: 30, t: 50, pad: 4 }
         };
 
         // Create the plot with enhanced interactivity
@@ -91,12 +91,20 @@ document.addEventListener('DOMContentLoaded', function() {
                 'hoverClosestGl2d',
                 'toggleSpikelines',
                 'resetScale2d'
-            ]
+            ],
+            responsive: true
         });
 
         // Make the chart responsive
         function resizeChart() {
-            Plotly.Plots.resize('chart');
+            const chartContainer = document.getElementById('chart');
+            const containerWidth = chartContainer.clientWidth;
+            const containerHeight = window.innerHeight * 0.6; // 60% of viewport height
+
+            Plotly.relayout('chart', {
+                width: containerWidth,
+                height: containerHeight
+            });
         }
 
         // Add event listener for window resize

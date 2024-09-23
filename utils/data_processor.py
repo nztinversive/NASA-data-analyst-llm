@@ -55,7 +55,9 @@ def process_query(query: str) -> Union[List, Dict]:
                     rangeslider=dict(visible=True),
                     type='linear'
                 ),
-                autosize=True
+                autosize=True,
+                font=dict(size=10),  # Reduce font size for better mobile display
+                legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1)  # Move legend to top
             )
             fig.update_traces(
                 hovertemplate="<b>%{y}</b><br>" +
@@ -91,15 +93,26 @@ def process_query(query: str) -> Union[List, Dict]:
             )
         elif 'status' in query.lower():
             fig = px.pie(df, names='Status', title='Mission Status Distribution')
+            fig.update_layout(
+                autosize=True,
+                font=dict(size=10),
+                legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1)
+            )
         else:
             fig = px.scatter(df, x='Year', y='Mission', color='Status', 
                              title='NASA Missions Timeline',
                              labels={'Year': 'Launch Year', 'Mission': 'Mission Name'},
                              hover_data=['Description'])
+            fig.update_layout(
+                autosize=True,
+                font=dict(size=10),
+                legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1)
+            )
         
         # Make the chart responsive
         fig.update_layout(
-            autosize=True
+            autosize=True,
+            margin=dict(l=30, r=30, t=50, b=30),  # Reduce margins for mobile
         )
         
         chart_json = fig.to_json()
