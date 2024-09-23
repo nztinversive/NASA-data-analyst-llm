@@ -47,7 +47,6 @@ def process_query(query: str) -> Union[List, Dict]:
                 xaxis_title='Launch Year',
                 yaxis_title='Mission Name',
                 legend_title_text='Mission Status',
-                height=600,
                 margin=dict(l=50, r=50, t=50, b=50),
                 hovermode='closest',
                 dragmode='pan',
@@ -56,6 +55,11 @@ def process_query(query: str) -> Union[List, Dict]:
                     type='linear'
                 ),
                 autosize=True,
+                title_font_size=14,
+                xaxis_title_font_size=12,
+                yaxis_title_font_size=12,
+                legend_font_size=10,
+                height=None,  # Remove fixed height
                 font=dict(size=10),  # Reduce font size for better mobile display
                 legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1)  # Move legend to top
             )
@@ -95,6 +99,8 @@ def process_query(query: str) -> Union[List, Dict]:
             fig = px.pie(df, names='Status', title='Mission Status Distribution')
             fig.update_layout(
                 autosize=True,
+                title_font_size=14,
+                legend_font_size=10,
                 font=dict(size=10),
                 legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1)
             )
@@ -105,6 +111,10 @@ def process_query(query: str) -> Union[List, Dict]:
                              hover_data=['Description'])
             fig.update_layout(
                 autosize=True,
+                title_font_size=14,
+                xaxis_title_font_size=12,
+                yaxis_title_font_size=12,
+                legend_font_size=10,
                 font=dict(size=10),
                 legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1)
             )

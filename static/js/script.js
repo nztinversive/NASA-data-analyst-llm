@@ -80,7 +80,19 @@ document.addEventListener('DOMContentLoaded', function() {
         const layout = {
             ...parsedChartData.layout,
             autosize: true,
-            margin: { l: 30, r: 30, b: 30, t: 50, pad: 4 }
+            margin: { l: 50, r: 30, b: 50, t: 50, pad: 4 },
+            title: {
+                font: { size: 16 }  // Adjust title font size
+            },
+            xaxis: {
+                title: { font: { size: 14 } }  // Adjust x-axis title font size
+            },
+            yaxis: {
+                title: { font: { size: 14 } }  // Adjust y-axis title font size
+            },
+            legend: {
+                font: { size: 12 }  // Adjust legend font size
+            }
         };
 
         // Create the plot with enhanced interactivity
@@ -99,11 +111,13 @@ document.addEventListener('DOMContentLoaded', function() {
         function resizeChart() {
             const chartContainer = document.getElementById('chart');
             const containerWidth = chartContainer.clientWidth;
-            const containerHeight = window.innerHeight * 0.6; // 60% of viewport height
+            const containerHeight = Math.max(300, window.innerHeight * 0.6);  // Set minimum height
 
             Plotly.relayout('chart', {
                 width: containerWidth,
-                height: containerHeight
+                height: containerHeight,
+                'xaxis.automargin': true,
+                'yaxis.automargin': true
             });
         }
 
