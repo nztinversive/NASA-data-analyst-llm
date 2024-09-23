@@ -78,14 +78,14 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // Create a responsive layout
         const layout = {
-            ...parsedChartData.layout,
             autosize: true,
             margin: { l: 50, r: 30, b: 50, t: 50, pad: 4 },
             title: {
                 font: { size: 16 }  // Adjust title font size
             },
             xaxis: {
-                title: { font: { size: 14 } }  // Adjust x-axis title font size
+                title: { font: { size: 14 } },  // Adjust x-axis title font size
+                rangeslider: {visible: true}
             },
             yaxis: {
                 title: { font: { size: 14 } }  // Adjust y-axis title font size
@@ -96,7 +96,7 @@ document.addEventListener('DOMContentLoaded', function() {
         };
 
         // Create the plot with enhanced interactivity
-        Plotly.newPlot('chart', parsedChartData.data, layout, {
+        Plotly.newPlot('chart', parsedChartData[0].data, {...layout, ...parsedChartData[0].layout}, {
             scrollZoom: true,
             editable: true,
             modeBarButtonsToAdd: [
@@ -106,6 +106,14 @@ document.addEventListener('DOMContentLoaded', function() {
             ],
             responsive: true
         });
+
+        // Add color customization
+        addColorCustomization();
+
+        // Add chart type toggle if there are multiple chart types
+        if (parsedChartData.length > 1) {
+            addChartTypeToggle(parsedChartData);
+        }
 
         // Make the chart responsive
         function resizeChart() {
@@ -126,6 +134,53 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // Call resizeChart once to ensure proper initial sizing
         resizeChart();
+    }
+
+    function addColorCustomization() {
+        const colorSchemes = {
+            'Default': {'Completed': '#1f77b4', 'Ongoing': '#ff7f0e'},
+            'High Contrast': {'Completed': '#000000', 'Ongoing': '#ff0000'},
+            'Pastel': {'Completed': '#b3e2cd', 'Ongoing': '#fdcdac'}
+        };
+
+        const colorSchemeSelect = document.createElement('select');
+        colorSchemeSelect.id = 'color-scheme-select';
+        Object.keys(colorSchemes).forEach(scheme => {
+            const option = document.createElement('option');
+            option.value = scheme;
+            option.textContent = scheme;
+            colorSchemeSelect.appendChild(option);
+        });
+
+        const colorSchemeLabel = document.createElement('label');
+        colorSchemeLabel.htmlFor = 'color-scheme-select';
+        colorSchemeLabel.textContent = 'Color Scheme: ';
+
+        const colorSchemeContainer = document.createElement('div');
+        colorSchemeContainer.appendChild(colorSchemeLabel);
+        colorSchemeContainer.appendChild(colorSchemeSelect);
+
+        chartDiv.insertBefore(colorSchemeContainer, chartDiv.firstChild);
+
+        colorSchemeSelect.addEventListener('change', function() {
+            const selectedScheme = colorSchemes[this.value];
+            Plotly.restyle('chart', {
+                'marker.color': [Object.values(selectedScheme)]
+            });
+        });
+    }
+
+    function addChartTypeToggle(chartData) {
+        const toggleButton = document.createElement('button');
+        toggleButton.textContent = 'Toggle Chart Type';
+        toggleButton.id = 'toggle-chart-type';
+        chartDiv.insertBefore(toggleButton, chartDiv.firstChild);
+
+        let currentChartIndex = 0;
+        toggleButton.addEventListener('click', function() {
+            currentChartIndex = (currentChartIndex + 1) % chartData.length;
+            Plotly.react('chart', chartData[currentChartIndex].data, chartData[currentChartIndex].layout);
+        });
     }
 
     function showError(message) {

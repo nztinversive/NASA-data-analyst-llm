@@ -36,14 +36,15 @@ def process_query(query: str) -> Union[List, Dict]:
         
         # Create visualization
         if 'year' in query.lower():
-            fig = px.scatter(df, x='Year', y='Mission', 
+            # Scatter plot
+            scatter_fig = px.scatter(df, x='Year', y='Mission', 
                              title='NASA Mission Launch Years',
                              labels={'Year': 'Launch Year', 'Mission': 'Mission Name'},
                              color='Status',
                              hover_data=['Description'],
                              size_max=20)
-            fig.update_traces(marker=dict(size=12))
-            fig.update_layout(
+            scatter_fig.update_traces(marker=dict(size=12))
+            scatter_fig.update_layout(
                 title=dict(
                     text='NASA Mission Launch Years',
                     font=dict(size=16),
@@ -68,40 +69,44 @@ def process_query(query: str) -> Union[List, Dict]:
                 font=dict(size=10),  # Reduce font size for better mobile display
                 legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1)  # Move legend to top
             )
-            fig.update_traces(
+            scatter_fig.update_traces(
                 hovertemplate="<b>%{y}</b><br>" +
                               "Launch Year: %{x}<br>" +
                               "Status: %{marker.color}<br>" +
                               "Description: %{customdata[0]}<extra></extra>"
             )
             
-            # Add buttons for filtering by status
-            fig.update_layout(
-                updatemenus=[
-                    dict(
-                        buttons=list([
-                            dict(label="All",
-                                 method="update",
-                                 args=[{"visible": [True] * len(df)}]),
-                            dict(label="Completed",
-                                 method="update",
-                                 args=[{"visible": [status == 'Completed' for status in df.Status]}]),
-                            dict(label="Ongoing",
-                                 method="update",
-                                 args=[{"visible": [status == 'Ongoing' for status in df.Status]}]),
-                        ]),
-                        direction="down",
-                        pad={"r": 10, "t": 10},
-                        showactive=True,
-                        x=0.1,
-                        xanchor="left",
-                        y=1.1,
-                        yanchor="top"
-                    ),
-                ]
+            # Bar chart
+            df['Decade'] = (df['Year'] // 10) * 10
+            missions_per_decade = df.groupby('Decade').size().reset_index(name='Count')
+            bar_fig = px.bar(missions_per_decade, x='Decade', y='Count',
+                             title='Number of NASA Missions per Decade',
+                             labels={'Decade': 'Decade', 'Count': 'Number of Missions'},
+                             hover_data=['Count'])
+            bar_fig.update_layout(
+                title=dict(
+                    text='Number of NASA Missions per Decade',
+                    font=dict(size=16),
+                    x=0.5,
+                    xanchor='center'
+                ),
+                xaxis_title='Decade',
+                yaxis_title='Number of Missions',
+                margin=dict(l=50, r=50, t=50, b=50),
+                autosize=True,
+                xaxis_title_font_size=12,
+                yaxis_title_font_size=12,
+                legend_font_size=10,
+                font=dict(size=10)
             )
+            bar_fig.update_traces(
+                hovertemplate="Decade: %{x}<br>Number of Missions: %{y}<extra></extra>"
+            )
+            
+            figs = [scatter_fig, bar_fig]
         elif 'status' in query.lower():
-            fig = px.pie(df, names='Status', title='Mission Status Distribution')
+            fig = px.pie(df, names='Status', title='Mission Status Distribution', hover_data=['Mission'])
+            fig.update_traces(textposition='inside', textinfo='percent+label')
             fig.update_layout(
                 title=dict(
                     text='Mission Status Distribution',
@@ -112,8 +117,10 @@ def process_query(query: str) -> Union[List, Dict]:
                 autosize=True,
                 legend_font_size=10,
                 font=dict(size=10),
-                legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1)
+                legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1),
+                hoverlabel=dict(bgcolor="white", font_size=12, font_family="Rockwell")
             )
+            figs = [fig]
         else:
             fig = px.scatter(df, x='Year', y='Mission', color='Status', 
                              title='NASA Missions Timeline',
@@ -133,14 +140,16 @@ def process_query(query: str) -> Union[List, Dict]:
                 font=dict(size=10),
                 legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1)
             )
+            figs = [fig]
         
-        # Make the chart responsive
-        fig.update_layout(
-            autosize=True,
-            margin=dict(l=30, r=30, t=50, b=30),  # Reduce margins for mobile
-        )
+        # Make the charts responsive
+        for fig in figs:
+            fig.update_layout(
+                autosize=True,
+                margin=dict(l=30, r=30, t=50, b=30),  # Reduce margins for mobile
+            )
         
-        chart_json = fig.to_json()
+        chart_json = json.dumps([fig.to_dict() for fig in figs])
         
         return {'data': result, 'chart': chart_json}
     except Exception as e:
