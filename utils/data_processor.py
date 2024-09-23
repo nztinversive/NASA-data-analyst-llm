@@ -5,6 +5,19 @@ import plotly.express as px
 import plotly.graph_objects as go
 import numpy as np
 
+def serialize_numpy(obj):
+    if isinstance(obj, np.integer):
+        return int(obj)
+    elif isinstance(obj, np.floating):
+        return float(obj)
+    elif isinstance(obj, np.ndarray):
+        return obj.tolist()
+    elif isinstance(obj, np.bool_):
+        return bool(obj)
+    elif isinstance(obj, np.void):
+        return None
+    return obj
+
 def process_query(query: str) -> Union[List, Dict]:
     try:
         # This is a placeholder function. In a real-world scenario, you would
@@ -150,16 +163,8 @@ def process_query(query: str) -> Union[List, Dict]:
                 margin=dict(l=30, r=30, t=50, b=30),  # Reduce margins for mobile
             )
         
-        chart_json = json.dumps([fig.to_dict() for fig in figs])
-        
-        def serialize_numpy(obj):
-            if isinstance(obj, np.ndarray):
-                return obj.tolist()
-            elif isinstance(obj, np.generic):
-                return obj.item()
-            raise TypeError(f'Object of type {type(obj)} is not JSON serializable')
-
         result = json.loads(json.dumps(result, default=serialize_numpy))
+        chart_json = json.dumps([fig.to_dict() for fig in figs], default=serialize_numpy)
         
         return {'data': result, 'chart': chart_json}
     except Exception as e:
