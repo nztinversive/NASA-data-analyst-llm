@@ -2,6 +2,7 @@ import pandas as pd
 import json
 from typing import Union, List, Dict
 import plotly.express as px
+import plotly.graph_objects as go
 
 def process_query(query: str) -> Union[List, Dict]:
     try:
@@ -12,7 +13,14 @@ def process_query(query: str) -> Union[List, Dict]:
         data = {
             'Mission': ['Apollo 11', 'Mars Rover', 'Hubble Telescope', 'Voyager 1', 'Cassini'],
             'Year': [1969, 2012, 1990, 1977, 1997],
-            'Status': ['Completed', 'Ongoing', 'Ongoing', 'Ongoing', 'Completed']
+            'Status': ['Completed', 'Ongoing', 'Ongoing', 'Ongoing', 'Completed'],
+            'Description': [
+                'First manned mission to land on the Moon',
+                'Exploration of Mars surface',
+                'Space telescope for deep space observation',
+                'Interstellar space probe',
+                'Exploration of Saturn and its moons'
+            ]
         }
         df = pd.DataFrame(data)
         
@@ -28,11 +36,28 @@ def process_query(query: str) -> Union[List, Dict]:
         
         # Create visualization
         if 'year' in query.lower():
-            fig = px.bar(df, x='Mission', y='Year', title='Mission Launch Years')
+            fig = px.bar(df, x='Mission', y='Year', 
+                         title='NASA Mission Launch Years',
+                         labels={'Mission': 'Mission Name', 'Year': 'Launch Year'},
+                         color='Status',
+                         hover_data=['Description'])
+            fig.update_layout(
+                yaxis_range=[1960, max(df['Year']) + 5],
+                legend_title_text='Mission Status'
+            )
+            fig.update_traces(
+                hovertemplate="<b>%{x}</b><br>" +
+                              "Launch Year: %{y}<br>" +
+                              "Status: %{marker.color}<br>" +
+                              "Description: %{customdata[0]}<extra></extra>"
+            )
         elif 'status' in query.lower():
             fig = px.pie(df, names='Status', title='Mission Status Distribution')
         else:
-            fig = px.scatter(df, x='Year', y='Mission', color='Status', title='NASA Missions Timeline')
+            fig = px.scatter(df, x='Year', y='Mission', color='Status', 
+                             title='NASA Missions Timeline',
+                             labels={'Year': 'Launch Year', 'Mission': 'Mission Name'},
+                             hover_data=['Description'])
         
         chart_json = fig.to_json()
         
