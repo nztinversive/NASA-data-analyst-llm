@@ -54,7 +54,8 @@ def process_query(query: str) -> Union[List, Dict]:
                 xaxis=dict(
                     rangeslider=dict(visible=True),
                     type='linear'
-                )
+                ),
+                autosize=True
             )
             fig.update_traces(
                 hovertemplate="<b>%{y}</b><br>" +
@@ -98,8 +99,7 @@ def process_query(query: str) -> Union[List, Dict]:
         
         # Make the chart responsive
         fig.update_layout(
-            autosize=True,
-            responsive=True
+            autosize=True
         )
         
         chart_json = fig.to_json()

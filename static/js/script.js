@@ -80,7 +80,6 @@ document.addEventListener('DOMContentLoaded', function() {
         const layout = {
             ...parsedChartData.layout,
             autosize: true,
-            responsive: true,
             margin: { l: 50, r: 50, b: 50, t: 50, pad: 4 }
         };
 
@@ -96,9 +95,15 @@ document.addEventListener('DOMContentLoaded', function() {
         });
 
         // Make the chart responsive
-        window.addEventListener('resize', function() {
+        function resizeChart() {
             Plotly.Plots.resize('chart');
-        });
+        }
+
+        // Add event listener for window resize
+        window.addEventListener('resize', resizeChart);
+
+        // Call resizeChart once to ensure proper initial sizing
+        resizeChart();
     }
 
     function showError(message) {
