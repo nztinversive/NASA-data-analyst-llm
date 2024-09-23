@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NASA Data Analysis Plugin</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <header>
+        <img src="{{ url_for('static', filename='img/nasa_logo.svg') }}" alt="NASA Logo" class="nasa-logo">
+        <h1>NASA Data Analysis Plugin</h1>
+    </header>
+    
+    <main>
+        <form id="query-form">
+            <label for="query">Enter your query:</label>
+            <input type="text" id="query" name="query" required>
+            <button type="submit">Analyze</button>
+        </form>
+
+        <div id="result" style="display: none;"></div>
+
+        <div id="history"></div>
+    </main>
+
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</body>
+</html>
