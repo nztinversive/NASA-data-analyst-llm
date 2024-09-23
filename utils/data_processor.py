@@ -55,7 +55,7 @@ def process_query(query: str) -> Union[List, Dict]:
                          color='Status',
                          hover_data=['Description'],
                          size_max=20)
-        scatter_fig.update_traces(marker=dict(size=12))
+        scatter_fig.update_traces(marker=dict(size=12), visible=True)
         scatter_fig.update_layout(
             title=dict(text='NASA Mission Launch Years', font=dict(size=16), x=0.5, xanchor='center'),
             xaxis_title='Launch Year',
@@ -66,33 +66,7 @@ def process_query(query: str) -> Union[List, Dict]:
             xaxis=dict(
                 rangeslider=dict(visible=True),
                 type='linear'
-            ),
-            updatemenus=[
-                dict(
-                    type="buttons",
-                    direction="left",
-                    buttons=[
-                        dict(args=[{"visible": [True, False, False, False]}],
-                             label="Scatter Plot",
-                             method="update"),
-                        dict(args=[{"visible": [False, True, False, False]}],
-                             label="Bar Chart",
-                             method="update"),
-                        dict(args=[{"visible": [False, False, True, False]}],
-                             label="Pie Chart",
-                             method="update"),
-                        dict(args=[{"visible": [False, False, False, True]}],
-                             label="Timeline",
-                             method="update")
-                    ],
-                    pad={"r": 10, "t": 10},
-                    showactive=True,
-                    x=0.11,
-                    xanchor="left",
-                    y=1.1,
-                    yanchor="top"
-                ),
-            ]
+            )
         )
         scatter_fig.update_traces(
             hovertemplate="<b>%{y}</b><br>" +
@@ -109,6 +83,7 @@ def process_query(query: str) -> Union[List, Dict]:
                          title='Mission Count by Status',
                          labels={'Status': 'Mission Status', 'Count': 'Number of Missions'},
                          color='Status')
+        bar_fig.update_traces(visible=False)
         bar_fig.update_layout(
             title=dict(text='Mission Count by Status', font=dict(size=16), x=0.5, xanchor='center'),
             xaxis_title='Mission Status',
@@ -127,7 +102,8 @@ def process_query(query: str) -> Union[List, Dict]:
             textinfo='percent+label',
             hovertemplate="<b>%{label}</b><br>" +
                           "Percentage: %{percent}<br>" +
-                          "Missions: %{customdata}<extra></extra>"
+                          "Missions: %{customdata}<extra></extra>",
+            visible=False
         )
         pie_fig.update_layout(
             title=dict(text='Mission Status Distribution', font=dict(size=16), x=0.5, xanchor='center'),
@@ -140,6 +116,7 @@ def process_query(query: str) -> Union[List, Dict]:
         timeline_fig = px.timeline(df, x_start='Year', x_end='Year', y='Mission', color='Status',
                                    hover_name='Mission', hover_data=['Description'])
         timeline_fig.update_yaxes(autorange="reversed")
+        timeline_fig.update_traces(visible=False)
         timeline_fig.update_layout(
             title=dict(text='NASA Missions Timeline', font=dict(size=16), x=0.5, xanchor='center'),
             xaxis_title='Year',
@@ -148,12 +125,42 @@ def process_query(query: str) -> Union[List, Dict]:
         )
         figs.append(timeline_fig)
         
-        # Make all charts responsive
+        # Create updatemenus for chart type selection
+        updatemenus = [
+            dict(
+                type="buttons",
+                direction="right",
+                x=0.1,
+                y=1.15,
+                showactive=True,
+                buttons=[
+                    dict(label="Scatter Plot",
+                         method="update",
+                         args=[{"visible": [True, False, False, False]},
+                               {"title": "NASA Mission Launch Years"}]),
+                    dict(label="Bar Chart",
+                         method="update",
+                         args=[{"visible": [False, True, False, False]},
+                               {"title": "Mission Count by Status"}]),
+                    dict(label="Pie Chart",
+                         method="update",
+                         args=[{"visible": [False, False, True, False]},
+                               {"title": "Mission Status Distribution"}]),
+                    dict(label="Timeline",
+                         method="update",
+                         args=[{"visible": [False, False, False, True]},
+                               {"title": "NASA Missions Timeline"}])
+                ]
+            )
+        ]
+        
+        # Make all charts responsive and add updatemenus
         for fig in figs:
             fig.update_layout(
                 autosize=True,
                 margin=dict(l=30, r=30, t=50, b=30),
-                legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1)
+                legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1),
+                updatemenus=updatemenus
             )
         
         result = json.loads(json.dumps(result, default=serialize_numpy))

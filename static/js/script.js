@@ -80,56 +80,41 @@ document.addEventListener('DOMContentLoaded', function() {
         const layout = {
             autosize: true,
             margin: { l: 50, r: 30, b: 50, t: 50, pad: 4 },
-            title: {
-                font: { size: 16 }
-            },
-            xaxis: {
-                title: { font: { size: 14 } },
-                rangeslider: {visible: true}
-            },
-            yaxis: {
-                title: { font: { size: 14 } }
-            },
-            legend: {
-                font: { size: 12 }
-            },
             updatemenus: parsedChartData[0].layout.updatemenus
         };
 
-        // Create the plot with enhanced interactivity
-        Plotly.newPlot('chart', parsedChartData[0].data, {...layout, ...parsedChartData[0].layout}, {
+        // Create the plot with all chart types
+        Plotly.newPlot('chart', parsedChartData.map(chart => chart.data).flat(), layout, {
             scrollZoom: true,
             editable: true,
-            modeBarButtonsToAdd: [
-                'hoverClosestGl2d',
-                'toggleSpikelines',
-                'resetScale2d'
-            ],
+            modeBarButtonsToAdd: ['hoverClosestGl2d', 'toggleSpikelines', 'resetScale2d'],
             responsive: true
         });
 
-        // Add color customization
-        addColorCustomization();
+        // Add event listener for button clicks
+        document.querySelectorAll('.updatemenu-button').forEach((button, index) => {
+            button.addEventListener('click', () => {
+                Plotly.update('chart', 
+                    parsedChartData.map(chart => chart.data.map(trace => ({visible: index === parsedChartData.indexOf(chart)}))).flat(),
+                    {title: parsedChartData[index].layout.title}
+                );
+            });
+        });
 
         // Make the chart responsive
         function resizeChart() {
             const chartContainer = document.getElementById('chart');
-            const containerWidth = chartContainer.clientWidth;
-            const containerHeight = Math.max(300, window.innerHeight * 0.6);
-
             Plotly.relayout('chart', {
-                width: containerWidth,
-                height: containerHeight,
-                'xaxis.automargin': true,
-                'yaxis.automargin': true
+                width: chartContainer.clientWidth,
+                height: Math.max(300, window.innerHeight * 0.6)
             });
         }
 
-        // Add event listener for window resize
         window.addEventListener('resize', resizeChart);
-
-        // Call resizeChart once to ensure proper initial sizing
         resizeChart();
+
+        // Add color customization
+        addColorCustomization();
     }
 
     function addColorCustomization() {
