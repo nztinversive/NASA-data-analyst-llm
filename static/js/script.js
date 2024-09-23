@@ -74,7 +74,31 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function showChart(chartData) {
         chartDiv.style.display = 'block';
-        Plotly.newPlot('chart', JSON.parse(chartData).data, JSON.parse(chartData).layout);
+        const parsedChartData = JSON.parse(chartData);
+        
+        // Create a responsive layout
+        const layout = {
+            ...parsedChartData.layout,
+            autosize: true,
+            responsive: true,
+            margin: { l: 50, r: 50, b: 50, t: 50, pad: 4 }
+        };
+
+        // Create the plot with enhanced interactivity
+        Plotly.newPlot('chart', parsedChartData.data, layout, {
+            scrollZoom: true,
+            editable: true,
+            modeBarButtonsToAdd: [
+                'hoverClosestGl2d',
+                'toggleSpikelines',
+                'resetScale2d'
+            ]
+        });
+
+        // Make the chart responsive
+        window.addEventListener('resize', function() {
+            Plotly.Plots.resize('chart');
+        });
     }
 
     function showError(message) {

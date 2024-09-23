@@ -48,13 +48,45 @@ def process_query(query: str) -> Union[List, Dict]:
                 yaxis_title='Mission Name',
                 legend_title_text='Mission Status',
                 height=600,
-                margin=dict(l=50, r=50, t=50, b=50)
+                margin=dict(l=50, r=50, t=50, b=50),
+                hovermode='closest',
+                dragmode='pan',
+                xaxis=dict(
+                    rangeslider=dict(visible=True),
+                    type='linear'
+                )
             )
             fig.update_traces(
                 hovertemplate="<b>%{y}</b><br>" +
                               "Launch Year: %{x}<br>" +
                               "Status: %{marker.color}<br>" +
                               "Description: %{customdata[0]}<extra></extra>"
+            )
+            
+            # Add buttons for filtering by status
+            fig.update_layout(
+                updatemenus=[
+                    dict(
+                        buttons=list([
+                            dict(label="All",
+                                 method="update",
+                                 args=[{"visible": [True] * len(df)}]),
+                            dict(label="Completed",
+                                 method="update",
+                                 args=[{"visible": [status == 'Completed' for status in df.Status]}]),
+                            dict(label="Ongoing",
+                                 method="update",
+                                 args=[{"visible": [status == 'Ongoing' for status in df.Status]}]),
+                        ]),
+                        direction="down",
+                        pad={"r": 10, "t": 10},
+                        showactive=True,
+                        x=0.1,
+                        xanchor="left",
+                        y=1.1,
+                        yanchor="top"
+                    ),
+                ]
             )
         elif 'status' in query.lower():
             fig = px.pie(df, names='Status', title='Mission Status Distribution')
@@ -63,6 +95,12 @@ def process_query(query: str) -> Union[List, Dict]:
                              title='NASA Missions Timeline',
                              labels={'Year': 'Launch Year', 'Mission': 'Mission Name'},
                              hover_data=['Description'])
+        
+        # Make the chart responsive
+        fig.update_layout(
+            autosize=True,
+            responsive=True
+        )
         
         chart_json = fig.to_json()
         
