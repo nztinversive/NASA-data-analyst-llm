@@ -4,6 +4,8 @@ document.addEventListener('DOMContentLoaded', function() {
     const chartDiv = document.getElementById('chart');
     const historyDiv = document.getElementById('history');
     const suggestionLinks = document.querySelectorAll('.suggestion');
+    const analyzeBtn = document.getElementById('analyze-btn');
+    const advancedAnalyzeBtn = document.getElementById('advanced-analyze-btn');
 
     form.addEventListener('submit', function(e) {
         e.preventDefault();
@@ -14,7 +16,19 @@ document.addEventListener('DOMContentLoaded', function() {
             return;
         }
 
-        analyzeQuery(query);
+        analyzeQuery(query, false);
+    });
+
+    advancedAnalyzeBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        const query = document.getElementById('query').value;
+        
+        if (!query.trim()) {
+            showError('Please enter a query');
+            return;
+        }
+
+        analyzeQuery(query, true);
     });
 
     suggestionLinks.forEach(link => {
@@ -22,12 +36,13 @@ document.addEventListener('DOMContentLoaded', function() {
             e.preventDefault();
             const query = this.textContent;
             document.getElementById('query').value = query;
-            analyzeQuery(query);
+            analyzeQuery(query, false);
         });
     });
 
-    function analyzeQuery(query) {
-        fetch('/analyze', {
+    function analyzeQuery(query, isAdvanced) {
+        const endpoint = isAdvanced ? '/advanced_analyze' : '/analyze';
+        fetch(endpoint, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded',
@@ -53,7 +68,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function showResult(result) {
-        resultDiv.innerHTML = `<h2>Analysis Result:</h2><pre>${JSON.stringify(result, null, 2)}</pre>`;
+        resultDiv.innerHTML = `<h2>Analysis Result:</h2><pre>${typeof result === 'string' ? result : JSON.stringify(result, null, 2)}</pre>`;
         resultDiv.style.display = 'block';
     }
 
