@@ -36,18 +36,23 @@ def process_query(query: str) -> Union[List, Dict]:
         
         # Create visualization
         if 'year' in query.lower():
-            fig = px.bar(df, x='Mission', y='Year', 
-                         title='NASA Mission Launch Years',
-                         labels={'Mission': 'Mission Name', 'Year': 'Launch Year'},
-                         color='Status',
-                         hover_data=['Description'])
+            fig = px.scatter(df, x='Year', y='Mission', 
+                             title='NASA Mission Launch Years',
+                             labels={'Year': 'Launch Year', 'Mission': 'Mission Name'},
+                             color='Status',
+                             hover_data=['Description'],
+                             size_max=20)
+            fig.update_traces(marker=dict(size=12))
             fig.update_layout(
-                yaxis_range=[1960, max(df['Year']) + 5],
-                legend_title_text='Mission Status'
+                xaxis_title='Launch Year',
+                yaxis_title='Mission Name',
+                legend_title_text='Mission Status',
+                height=600,
+                margin=dict(l=50, r=50, t=50, b=50)
             )
             fig.update_traces(
-                hovertemplate="<b>%{x}</b><br>" +
-                              "Launch Year: %{y}<br>" +
+                hovertemplate="<b>%{y}</b><br>" +
+                              "Launch Year: %{x}<br>" +
                               "Status: %{marker.color}<br>" +
                               "Description: %{customdata[0]}<extra></extra>"
             )
