@@ -65,7 +65,9 @@ button:hover {
     word-wrap: break-word;
     overflow-wrap: break-word;
     white-space: pre-wrap;
-    padding: 15px;
+    word-break: break-word;
+    overflow-x: hidden;
+    text-overflow: ellipsis;
     box-sizing: border-box;
 }
 
