@@ -44,6 +44,12 @@ def process_query(query: str) -> Union[List, Dict]:
                              size_max=20)
             fig.update_traces(marker=dict(size=12))
             fig.update_layout(
+                title=dict(
+                    text='NASA Mission Launch Years',
+                    font=dict(size=16),
+                    x=0.5,
+                    xanchor='center'
+                ),
                 xaxis_title='Launch Year',
                 yaxis_title='Mission Name',
                 legend_title_text='Mission Status',
@@ -55,7 +61,6 @@ def process_query(query: str) -> Union[List, Dict]:
                     type='linear'
                 ),
                 autosize=True,
-                title_font_size=14,
                 xaxis_title_font_size=12,
                 yaxis_title_font_size=12,
                 legend_font_size=10,
@@ -98,8 +103,13 @@ def process_query(query: str) -> Union[List, Dict]:
         elif 'status' in query.lower():
             fig = px.pie(df, names='Status', title='Mission Status Distribution')
             fig.update_layout(
+                title=dict(
+                    text='Mission Status Distribution',
+                    font=dict(size=16),
+                    x=0.5,
+                    xanchor='center'
+                ),
                 autosize=True,
-                title_font_size=14,
                 legend_font_size=10,
                 font=dict(size=10),
                 legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1)
@@ -110,8 +120,13 @@ def process_query(query: str) -> Union[List, Dict]:
                              labels={'Year': 'Launch Year', 'Mission': 'Mission Name'},
                              hover_data=['Description'])
             fig.update_layout(
+                title=dict(
+                    text='NASA Missions Timeline',
+                    font=dict(size=16),
+                    x=0.5,
+                    xanchor='center'
+                ),
                 autosize=True,
-                title_font_size=14,
                 xaxis_title_font_size=12,
                 yaxis_title_font_size=12,
                 legend_font_size=10,
