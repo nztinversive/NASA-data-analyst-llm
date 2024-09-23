@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>NASA Data Analysis Plugin</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
 </head>
 <body>
     <header>
@@ -19,7 +20,17 @@
             <button type="submit">Analyze</button>
         </form>
 
+        <div id="suggestions">
+            <h3>Suggested Queries:</h3>
+            <ul>
+                {% for suggestion in suggestions %}
+                <li><a href="#" class="suggestion">{{ suggestion }}</a></li>
+                {% endfor %}
+            </ul>
+        </div>
+
         <div id="result" style="display: none;"></div>
+        <div id="chart" style="display: none;"></div>
 
         <div id="history"></div>
     </main>

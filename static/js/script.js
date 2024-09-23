@@ -1,7 +1,9 @@
 document.addEventListener('DOMContentLoaded', function() {
     const form = document.getElementById('query-form');
     const resultDiv = document.getElementById('result');
+    const chartDiv = document.getElementById('chart');
     const historyDiv = document.getElementById('history');
+    const suggestionLinks = document.querySelectorAll('.suggestion');
 
     form.addEventListener('submit', function(e) {
         e.preventDefault();
@@ -12,6 +14,19 @@ document.addEventListener('DOMContentLoaded', function() {
             return;
         }
 
+        analyzeQuery(query);
+    });
+
+    suggestionLinks.forEach(link => {
+        link.addEventListener('click', function(e) {
+            e.preventDefault();
+            const query = this.textContent;
+            document.getElementById('query').value = query;
+            analyzeQuery(query);
+        });
+    });
+
+    function analyzeQuery(query) {
         fetch('/analyze', {
             method: 'POST',
             headers: {
@@ -25,21 +40,32 @@ document.addEventListener('DOMContentLoaded', function() {
                 showError(data.error);
             } else {
                 showResult(data.result);
+                if (data.chart) {
+                    showChart(data.chart);
+                } else {
+                    chartDiv.style.display = 'none';
+                }
             }
         })
         .catch(error => {
             showError('An error occurred while processing your request');
         });
-    });
+    }
 
     function showResult(result) {
         resultDiv.innerHTML = `<h2>Analysis Result:</h2><pre>${JSON.stringify(result, null, 2)}</pre>`;
         resultDiv.style.display = 'block';
     }
 
+    function showChart(chartData) {
+        chartDiv.style.display = 'block';
+        Plotly.newPlot('chart', JSON.parse(chartData));
+    }
+
     function showError(message) {
         resultDiv.innerHTML = `<p class="error">${message}</p>`;
         resultDiv.style.display = 'block';
+        chartDiv.style.display = 'none';
     }
 
     function loadQueryHistory() {
