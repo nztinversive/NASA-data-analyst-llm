@@ -22,7 +22,7 @@ def process_with_llama(query: str) -> str:
                     "content": query,
                 }
             ],
-            model="llama2-70b-4096",
+            model="llama2-70b-chat",  # Updated model name
             max_tokens=1000,
         )
         return chat_completion.choices[0].message.content
