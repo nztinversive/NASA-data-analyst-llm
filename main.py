@@ -3,8 +3,6 @@ from utils.data_processor import process_query, get_query_suggestions
 from utils.db_manager import save_query, get_query_history
 from utils.llama_integration import process_with_llama, get_advanced_query_suggestions
 import os
-import plotly.express as px
-import pandas as pd
 
 app = Flask(__name__)
 
@@ -27,17 +25,9 @@ def analyze():
         if isinstance(result, dict) and 'error' in result:
             return jsonify(result), 500
 
-        save_query(query, result)
+        save_query(query, result['data'])
 
-        # Generate a simple bar chart for visualization
-        if isinstance(result, list) and len(result) > 0 and isinstance(result[0], (int, float)):
-            df = pd.DataFrame({'value': result})
-            fig = px.bar(df, y='value', title=f"Results for query: {query}")
-            chart_json = fig.to_json()
-        else:
-            chart_json = None
-
-        return jsonify({'result': result, 'chart': chart_json})
+        return jsonify({'result': result['data'], 'chart': result['chart']})
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 

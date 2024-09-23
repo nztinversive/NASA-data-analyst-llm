@@ -74,7 +74,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function showChart(chartData) {
         chartDiv.style.display = 'block';
-        Plotly.newPlot('chart', JSON.parse(chartData));
+        Plotly.newPlot('chart', JSON.parse(chartData).data, JSON.parse(chartData).layout);
     }
 
     function showError(message) {
