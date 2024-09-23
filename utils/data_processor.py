@@ -3,6 +3,7 @@ import json
 from typing import Union, List, Dict
 import plotly.express as px
 import plotly.graph_objects as go
+import numpy as np
 
 def process_query(query: str) -> Union[List, Dict]:
     try:
@@ -150,6 +151,15 @@ def process_query(query: str) -> Union[List, Dict]:
             )
         
         chart_json = json.dumps([fig.to_dict() for fig in figs])
+        
+        def serialize_numpy(obj):
+            if isinstance(obj, np.ndarray):
+                return obj.tolist()
+            elif isinstance(obj, np.generic):
+                return obj.item()
+            raise TypeError(f'Object of type {type(obj)} is not JSON serializable')
+
+        result = json.loads(json.dumps(result, default=serialize_numpy))
         
         return {'data': result, 'chart': chart_json}
     except Exception as e:
