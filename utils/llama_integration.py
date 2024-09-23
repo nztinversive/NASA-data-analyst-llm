@@ -1,11 +1,15 @@
 import os
 from groq import Groq
 
-client = Groq(
-    api_key=os.environ.get("GROQ_API_KEY"),
-)
+# Initialize the client only if the API key is available
+client = None
+if os.environ.get("GROQ_API_KEY"):
+    client = Groq(api_key=os.environ.get("GROQ_API_KEY"))
 
 def process_with_llama(query: str) -> str:
+    if not client:
+        return "Error: Groq API key is not set. Advanced analysis is not available."
+    
     try:
         chat_completion = client.chat.completions.create(
             messages=[
