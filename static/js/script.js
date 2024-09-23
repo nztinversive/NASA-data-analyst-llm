@@ -81,18 +81,19 @@ document.addEventListener('DOMContentLoaded', function() {
             autosize: true,
             margin: { l: 50, r: 30, b: 50, t: 50, pad: 4 },
             title: {
-                font: { size: 16 }  // Adjust title font size
+                font: { size: 16 }
             },
             xaxis: {
-                title: { font: { size: 14 } },  // Adjust x-axis title font size
+                title: { font: { size: 14 } },
                 rangeslider: {visible: true}
             },
             yaxis: {
-                title: { font: { size: 14 } }  // Adjust y-axis title font size
+                title: { font: { size: 14 } }
             },
             legend: {
-                font: { size: 12 }  // Adjust legend font size
-            }
+                font: { size: 12 }
+            },
+            updatemenus: parsedChartData[0].layout.updatemenus
         };
 
         // Create the plot with enhanced interactivity
@@ -110,16 +111,11 @@ document.addEventListener('DOMContentLoaded', function() {
         // Add color customization
         addColorCustomization();
 
-        // Add chart type toggle if there are multiple chart types
-        if (parsedChartData.length > 1) {
-            addChartTypeToggle(parsedChartData);
-        }
-
         // Make the chart responsive
         function resizeChart() {
             const chartContainer = document.getElementById('chart');
             const containerWidth = chartContainer.clientWidth;
-            const containerHeight = Math.max(300, window.innerHeight * 0.6);  // Set minimum height
+            const containerHeight = Math.max(300, window.innerHeight * 0.6);
 
             Plotly.relayout('chart', {
                 width: containerWidth,
@@ -167,19 +163,6 @@ document.addEventListener('DOMContentLoaded', function() {
             Plotly.restyle('chart', {
                 'marker.color': [Object.values(selectedScheme)]
             });
-        });
-    }
-
-    function addChartTypeToggle(chartData) {
-        const toggleButton = document.createElement('button');
-        toggleButton.textContent = 'Toggle Chart Type';
-        toggleButton.id = 'toggle-chart-type';
-        chartDiv.insertBefore(toggleButton, chartDiv.firstChild);
-
-        let currentChartIndex = 0;
-        toggleButton.addEventListener('click', function() {
-            currentChartIndex = (currentChartIndex + 1) % chartData.length;
-            Plotly.react('chart', chartData[currentChartIndex].data, chartData[currentChartIndex].layout);
         });
     }
 
