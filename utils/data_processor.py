@@ -136,23 +136,25 @@ def process_query(query: str) -> Union[List, Dict]:
                 buttons=[
                     dict(label="Scatter Plot",
                          method="update",
-                         args=[{"visible": [True, False, False, False]},
-                               {"title": "NASA Mission Launch Years"}]),
+                         args=[{"visible": [True, False, False, False]}]),
                     dict(label="Bar Chart",
                          method="update",
-                         args=[{"visible": [False, True, False, False]},
-                               {"title": "Mission Count by Status"}]),
+                         args=[{"visible": [False, True, False, False]}]),
                     dict(label="Pie Chart",
                          method="update",
-                         args=[{"visible": [False, False, True, False]},
-                               {"title": "Mission Status Distribution"}]),
+                         args=[{"visible": [False, False, True, False]}]),
                     dict(label="Timeline",
                          method="update",
-                         args=[{"visible": [False, False, False, True]},
-                               {"title": "NASA Missions Timeline"}])
+                         args=[{"visible": [False, False, False, True]}])
                 ]
             )
         ]
+        
+        # Set initial visibility for each chart
+        scatter_fig.update_traces(visible=True)
+        bar_fig.update_traces(visible=False)
+        pie_fig.update_traces(visible=False)
+        timeline_fig.update_traces(visible=False)
         
         # Make all charts responsive and add updatemenus
         for fig in figs:
