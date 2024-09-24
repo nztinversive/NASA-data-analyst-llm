@@ -45,6 +45,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     function analyzeMission(mission, isAdvanced) {
+        showLoading();
         const endpoint = isAdvanced ? '/advanced_analyze' : '/analyze';
         fetch(endpoint, {
             method: 'POST',
@@ -55,11 +56,14 @@ document.addEventListener('DOMContentLoaded', function() {
         })
         .then(response => {
             if (!response.ok) {
-                throw new Error('Network response was not ok');
+                return response.text().then(text => {
+                    throw new Error(`HTTP error! status: ${response.status}, message: ${text}`);
+                });
             }
             return response.json();
         })
         .then(data => {
+            hideLoading();
             if (data.error) {
                 showError(data.error);
             } else {
@@ -68,7 +72,9 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         })
         .catch(error => {
+            hideLoading();
             showError('An error occurred while processing your request: ' + error.message);
+            console.error('Fetch error:', error);
         });
     }
 
@@ -81,7 +87,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 resultItem.className = 'result-item';
                 resultItem.innerHTML = `
                     <h4>${item.name || 'Result'}</h4>
-                    <p>${item.value || item}</p>
+                    <p>${formatText(item.value || item)}</p>
                 `;
                 resultContent.appendChild(resultItem);
             });
@@ -91,12 +97,12 @@ document.addEventListener('DOMContentLoaded', function() {
                 resultItem.className = 'result-item';
                 resultItem.innerHTML = `
                     <h4>${key}</h4>
-                    <p>${value}</p>
+                    <p>${formatText(value)}</p>
                 `;
                 resultContent.appendChild(resultItem);
             }
         } else {
-            resultContent.innerHTML = `<p>${result}</p>`;
+            resultContent.innerHTML = `<p>${formatText(result)}</p>`;
         }
 
         if (chartData) {
@@ -107,6 +113,26 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         document.getElementById('analysis-results').style.display = 'block';
+    }
+
+    function formatText(text) {
+        // Split the text into sentences
+        const sentences = text.split(/(?<=[.!?])\s+/);
+        // Join sentences with line breaks
+        return sentences.join('<br><br>');
+    }
+
+    function showLoading() {
+        resultContent.innerHTML = '<div class="loading">Processing your cosmic mission...</div>';
+        resultContent.style.display = 'block';
+        chartContent.style.display = 'none';
+    }
+
+    function hideLoading() {
+        const loadingElement = resultContent.querySelector('.loading');
+        if (loadingElement) {
+            loadingElement.remove();
+        }
     }
 
     function showError(message) {

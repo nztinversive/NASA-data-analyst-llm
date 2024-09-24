@@ -478,3 +478,43 @@ footer {
   outline: none;
   box-shadow: 0 0 0 2px var(--accent-color), 0 0 20px rgba(76, 201, 240, 0.5);
 }
+
+.loading {
+    text-align: center;
+    padding: 20px;
+    font-size: 1.2rem;
+    color: var(--accent-color);
+    animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+    0% { opacity: 0.6; }
+    50% { opacity: 1; }
+    100% { opacity: 0.6; }
+}
+
+.mission-guide {
+    margin-top: 20px;
+    padding: 15px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    font-size: 0.9rem;
+}
+
+.mission-guide p {
+    margin-bottom: 10px;
+    color: var(--accent-color);
+}
+
+.mission-guide ul {
+    list-style-type: none;
+    padding-left: 0;
+}
+
+.mission-guide li {
+    margin-bottom: 8px;
+}
+
+.mission-guide strong {
+    color: var(--cosmic-orange);
+}

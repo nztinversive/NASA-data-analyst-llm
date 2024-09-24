@@ -39,6 +39,7 @@ def analyze():
         # Return the processed data and chart information
         return jsonify({'result': result['data'], 'chart': result['chart']})
     except Exception as e:
+        app.logger.error(f"Error in /analyze: {str(e)}")
         return jsonify({'error': str(e)}), 500
 
 @app.route('/advanced_analyze', methods=['POST'])
@@ -54,6 +55,7 @@ def advanced_analyze():
         save_query(mission, result)
         return jsonify({'result': result})
     except Exception as e:
+        app.logger.error(f"Error in /advanced_analyze: {str(e)}")
         return jsonify({'error': str(e)}), 500
 
 @app.route('/history')
@@ -73,4 +75,4 @@ def suggestions():
 
 if __name__ == '__main__':
     # Run the Flask application
-    app.run(host='0.0.0.0', port=5000)
+    app.run(host='0.0.0.0', port=5000, debug=True)
