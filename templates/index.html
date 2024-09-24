@@ -11,12 +11,14 @@
 </head>
 <body>
     <header>
-        <!-- Display NASA logo -->
-        <img src="{{ url_for('static', filename='img/nasa_logo.svg') }}" alt="NASA Logo" class="nasa-logo">
-        <h1>NASA Data Analysis Plugin</h1>
+        <div class="container header-content">
+            <!-- Display NASA logo -->
+            <img src="{{ url_for('static', filename='img/nasa_logo.svg') }}" alt="NASA Logo" class="nasa-logo">
+            <h1>NASA Data Analysis Plugin</h1>
+        </div>
     </header>
     
-    <main>
+    <main class="container">
         <!-- Form for user to input queries -->
         <form id="query-form">
             <label for="query">Enter your query:</label>
