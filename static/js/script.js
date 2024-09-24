@@ -95,7 +95,7 @@ document.addEventListener('DOMContentLoaded', function() {
         parsedChartData[0].layout.updatemenus[0].buttons.forEach((button, index) => {
             button.click = function() {
                 Plotly.update('chart', 
-                    {'visible': button.args[0].visible},
+                    {'visible': parsedChartData.map((_, i) => i === index)},
                     {'title': button.args[1].title}
                 );
             };
