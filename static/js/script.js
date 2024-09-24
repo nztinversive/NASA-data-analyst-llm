@@ -1,7 +1,7 @@
 // Wait for the DOM to be fully loaded before executing the script
 document.addEventListener('DOMContentLoaded', function() {
     // Cache DOM elements for better performance
-    const form = document.getElementById('query-form');
+    const form = document.getElementById('mission-form');
     const resultDiv = document.getElementById('result');
     const chartDiv = document.getElementById('chart');
     const historyDiv = document.getElementById('history');
@@ -16,60 +16,56 @@ document.addEventListener('DOMContentLoaded', function() {
     // Event listener for form submission (standard analysis)
     form.addEventListener('submit', function(e) {
         e.preventDefault();
-        const query = document.getElementById('query').value;
+        const mission = document.getElementById('mission').value;
         
-        if (!query.trim()) {
-            showError('Please enter a query');
+        if (!mission.trim()) {
+            showError('Please enter a mission');
             return;
         }
 
-        analyzeQuery(query, false);
+        analyzeMission(mission, false);
     });
 
     // Event listener for advanced analysis button
     advancedAnalyzeBtn.addEventListener('click', function(e) {
         e.preventDefault();
-        const query = document.getElementById('query').value;
+        const mission = document.getElementById('mission').value;
         
-        if (!query.trim()) {
-            showError('Please enter a query');
+        if (!mission.trim()) {
+            showError('Please enter a mission');
             return;
         }
 
-        analyzeQuery(query, true);
+        analyzeMission(mission, true);
     });
 
     // Add click event listeners to suggestion links
     suggestionLinks.forEach(link => {
         link.addEventListener('click', function(e) {
             e.preventDefault();
-            const query = this.textContent;
-            document.getElementById('query').value = query;
-            analyzeQuery(query, false);
+            const mission = this.textContent;
+            document.getElementById('mission').value = mission;
+            analyzeMission(mission, false);
         });
     });
 
-    // Function to send query to server for analysis
-    function analyzeQuery(query, isAdvanced) {
+    // Function to send mission to server for analysis
+    function analyzeMission(mission, isAdvanced) {
         const endpoint = isAdvanced ? '/advanced_analyze' : '/analyze';
         fetch(endpoint, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded',
             },
-            body: `query=${encodeURIComponent(query)}`
+            body: `mission=${encodeURIComponent(mission)}`
         })
         .then(response => response.json())
         .then(data => {
             if (data.error) {
                 showError(data.error);
             } else {
-                showResult(data.result);
-                if (data.chart) {
-                    showChart(data.chart);
-                } else {
-                    chartDiv.style.display = 'none';
-                }
+                displayResults(data.result, data.chart);
+                loadMissionHistory(); // Refresh the mission history
             }
         })
         .catch(error => {
@@ -78,9 +74,45 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // Function to display analysis results
-    function showResult(result) {
-        resultDiv.innerHTML = `<h2>Analysis Result:</h2><pre>${typeof result === 'string' ? result : JSON.stringify(result, null, 2)}</pre>`;
-        resultDiv.style.display = 'block';
+    function displayResults(result, chartData) {
+        const resultContent = document.getElementById('result-content');
+        const chartContent = document.getElementById('chart-content');
+        const analysisResults = document.getElementById('analysis-results');
+
+        resultContent.innerHTML = '';
+        
+        if (Array.isArray(result)) {
+            result.forEach(item => {
+                const resultItem = document.createElement('div');
+                resultItem.className = 'result-item';
+                resultItem.innerHTML = `
+                    <h4>${item.name || 'Result'}</h4>
+                    <p>${item.value || item}</p>
+                `;
+                resultContent.appendChild(resultItem);
+            });
+        } else if (typeof result === 'object') {
+            for (const [key, value] of Object.entries(result)) {
+                const resultItem = document.createElement('div');
+                resultItem.className = 'result-item';
+                resultItem.innerHTML = `
+                    <h4>${key}</h4>
+                    <p>${value}</p>
+                `;
+                resultContent.appendChild(resultItem);
+            }
+        } else {
+            resultContent.innerHTML = `<p>${result}</p>`;
+        }
+
+        if (chartData) {
+            Plotly.newPlot('chart-content', JSON.parse(chartData));
+            chartContent.style.display = 'block';
+        } else {
+            chartContent.style.display = 'none';
+        }
+
+        analysisResults.style.display = 'block';
     }
 
     // Function to display chart using Plotly
@@ -151,49 +183,57 @@ document.addEventListener('DOMContentLoaded', function() {
         chartDiv.style.display = 'none';
     }
 
-    // Function to load and display query history
-    function loadQueryHistory() {
+    // Function to load and display mission history
+    function loadMissionHistory() {
         fetch(`/history?page=${currentPage}&per_page=${itemsPerPage}`)
         .then(response => response.json())
         .then(data => {
-            historyDiv.innerHTML = '<h2>Query History:</h2>';
-            const ul = document.createElement('ul');
-            data.forEach(item => {
-                const li = document.createElement('li');
-                li.textContent = `Query: ${item.query}, Result: ${JSON.stringify(item.result)}`;
-                ul.appendChild(li);
-            });
-            historyDiv.appendChild(ul);
-
-            // Add pagination controls
-            const paginationDiv = document.createElement('div');
-            paginationDiv.className = 'pagination';
-            
-            const prevButton = document.createElement('button');
-            prevButton.textContent = 'Previous';
-            prevButton.addEventListener('click', () => {
-                if (currentPage > 1) {
-                    currentPage--;
-                    loadQueryHistory();
-                }
-            });
-            
-            const nextButton = document.createElement('button');
-            nextButton.textContent = 'Next';
-            nextButton.addEventListener('click', () => {
-                currentPage++;
-                loadQueryHistory();
-            });
-            
-            paginationDiv.appendChild(prevButton);
-            paginationDiv.appendChild(nextButton);
-            historyDiv.appendChild(paginationDiv);
+            displayMissionHistory(data);
+            updatePaginationButtons(data.length === itemsPerPage);
         })
         .catch(error => {
-            historyDiv.innerHTML = '<p class="error">Failed to load query history</p>';
+            console.error('Error loading mission history:', error);
         });
     }
 
-    // Load query history when the page loads
-    loadQueryHistory();
+    // Function to display mission history
+    function displayMissionHistory(missions) {
+        const historyList = document.getElementById('history-list');
+        historyList.innerHTML = '';
+
+        missions.forEach(mission => {
+            const li = document.createElement('li');
+            li.textContent = mission.mission;
+            li.addEventListener('click', () => {
+                document.getElementById('mission').value = mission.mission;
+                analyzeMission(mission.mission, false);
+            });
+            historyList.appendChild(li);
+        });
+    }
+
+    // Function to update pagination buttons
+    function updatePaginationButtons(hasNextPage) {
+        const prevButton = document.getElementById('prev-page');
+        const nextButton = document.getElementById('next-page');
+
+        prevButton.disabled = currentPage === 1;
+        nextButton.disabled = !hasNextPage;
+    }
+
+    // Add event listeners for pagination buttons
+    document.getElementById('prev-page').addEventListener('click', () => {
+        if (currentPage > 1) {
+            currentPage--;
+            loadMissionHistory();
+        }
+    });
+
+    document.getElementById('next-page').addEventListener('click', () => {
+        currentPage++;
+        loadMissionHistory();
+    });
+
+    // Load mission history when the page loads
+    loadMissionHistory();
 });

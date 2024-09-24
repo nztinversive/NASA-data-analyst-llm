@@ -3,52 +3,82 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NASA Data Analysis Plugin</title>
-    <!-- Link to external CSS file for styling -->
+    <title>Cosmos Explorer: NASA Data Analysis Hub</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-    <!-- Include Plotly.js library for interactive charts -->
     <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='img/logo.png') }}">
 </head>
 <body>
+    <div id="stars"></div>
+    <div id="stars2"></div>
+    <div id="stars3"></div>
+    
     <header>
         <div class="container header-content">
-            <!-- Display NASA logo -->
-            <img src="{{ url_for('static', filename='img/nasa_logo.svg') }}" alt="NASA Logo" class="nasa-logo">
-            <h1>NASA Data Analysis Plugin</h1>
+            <img src="{{ url_for('static', filename='img/logo.png') }}" alt="Cosmos Explorer Logo" class="logo">
+            <h1>Cosmos Explorer</h1>
         </div>
     </header>
     
     <main class="container">
-        <!-- Form for user to input queries -->
-        <form id="query-form">
-            <label for="query">Enter your query:</label>
-            <input type="text" id="query" name="query" required>
-            <!-- Button for standard analysis -->
-            <button type="submit" id="analyze-btn">Analyze</button>
-            <!-- Button for advanced analysis (likely using LLaMA model) -->
-            <button type="button" id="advanced-analyze-btn">Advanced Analyze</button>
+        <section id="intro" class="card">
+            <h2>Welcome to Cosmos Explorer</h2>
+            <p>Harness the power of advanced data analysis to explore NASA's vast cosmic datasets. Uncover insights, visualize trends, and push the boundaries of space exploration.</p>
+        </section>
+
+        <form id="mission-form" class="card">
+            <label for="mission"><i class="fas fa-search"></i> Launch your cosmic mission:</label>
+            <div class="input-group">
+                <input type="text" id="mission" name="mission" required placeholder="Enter your space exploration mission...">
+                <div class="button-container">
+                    <button type="submit" id="analyze-btn"><i class="fas fa-rocket"></i> Launch Mission</button>
+                    <button type="button" id="advanced-analyze-btn"><i class="fas fa-atom"></i> Advanced Launch</button>
+                </div>
+            </div>
         </form>
 
-        <!-- Section to display query suggestions -->
-        <div id="suggestions">
-            <h3>Suggested Queries:</h3>
-            <ul>
-                <!-- Loop through suggestions passed from the backend -->
-                {% for suggestion in suggestions %}
-                <li><a href="#" class="suggestion">{{ suggestion }}</a></li>
-                {% endfor %}
-            </ul>
+        <div class="content-grid">
+            <aside class="sidebar">
+                <section id="suggestions" class="card">
+                    <h3><i class="fas fa-lightbulb"></i> Suggested Missions</h3>
+                    <ul>
+                        {% for suggestion in suggestions %}
+                        <li><a href="#" class="suggestion"><i class="fas fa-star"></i> {{ suggestion }}</a></li>
+                        {% endfor %}
+                    </ul>
+                </section>
+
+                <section id="history" class="card">
+                    <h3><i class="fas fa-history"></i> Mission History</h3>
+                    <div id="history-content">
+                        <ul id="history-list"></ul>
+                    </div>
+                    <div class="pagination">
+                        <button id="prev-page"><i class="fas fa-chevron-left"></i> Previous</button>
+                        <button id="next-page">Next <i class="fas fa-chevron-right"></i></button>
+                    </div>
+                </section>
+            </aside>
+
+            <section id="analysis-results" class="card">
+                <h3><i class="fas fa-chart-bar"></i> Mission Results</h3>
+                <div id="result-content" class="result-grid"></div>
+                <div id="chart-content"></div>
+            </section>
         </div>
-
-        <!-- Containers for displaying analysis results and charts -->
-        <div id="result" style="display: none;"></div>
-        <div id="chart" style="display: none;"></div>
-
-        <!-- Container for displaying query history -->
-        <div id="history"></div>
     </main>
 
-    <!-- Link to external JavaScript file for interactive functionality -->
+    <footer>
+        <div class="container">
+            <p>&copy; 2024 Cosmos Explorer: NASA Data Analysis Hub. All rights reserved.</p>
+            <div class="social-links">
+                <a href="https://github.com/nztinversive" target="_blank" title="GitHub"><i class="fab fa-github"></i></a>
+            </div>
+        </div>
+    </footer>
+
     <script src="{{ url_for('static', filename='js/script.js') }}"></script>
 </body>
 </html>
