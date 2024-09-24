@@ -2,6 +2,8 @@ import pandas as pd
 import json
 from typing import Union, List, Dict
 import plotly.express as px
+import plotly.graph_objects as go
+from plotly.subplots import make_subplots
 import numpy as np
 
 def serialize_numpy(obj):
@@ -30,6 +32,14 @@ def process_query(query: str) -> Union[List, Dict]:
                 'Space telescope for deep space observation',
                 'Interstellar space probe',
                 'Exploration of Saturn and its moons'
+            ],
+            'Duration': ['8 days', '10+ years', '30+ years', '45+ years', '20 years'],
+            'Key Achievements': [
+                'First human on the Moon',
+                'Discovery of ancient riverbeds on Mars',
+                'Deep field images of the universe',
+                'First human-made object to leave the solar system',
+                'Discovery of ocean worlds on Saturn\'s moons'
             ]
         }
         df = pd.DataFrame(data)
@@ -44,23 +54,72 @@ def process_query(query: str) -> Union[List, Dict]:
         else:
             result = df.to_dict(orient='records')
         
-        # Create a single scatter plot
-        fig = px.scatter(df, x='Year', y='Mission', 
-                         title='NASA Mission Launch Years',
-                         labels={'Year': 'Launch Year', 'Mission': 'Mission Name'},
-                         color='Status',
-                         hover_data=['Description'],
-                         size_max=20)
+        # Create scatter plot
+        scatter_fig = px.scatter(df, x='Year', y='Mission', 
+                                 title='NASA Mission Launch Years',
+                                 labels={'Year': 'Launch Year', 'Mission': 'Mission Name'},
+                                 color='Status',
+                                 hover_data=['Description', 'Duration', 'Key Achievements'],
+                                 size_max=20)
         
-        fig.update_traces(marker=dict(size=12))
-        fig.update_layout(
+        scatter_fig.update_traces(marker=dict(size=12))
+        scatter_fig.update_layout(
             title=dict(text='NASA Mission Launch Years', font=dict(size=16), x=0.5, xanchor='center'),
             xaxis_title='Launch Year',
             yaxis_title='Mission Name',
             legend_title_text='Mission Status',
             hovermode='closest',
-            autosize=True,
-            margin=dict(l=50, r=30, t=50, b=50),
+            dragmode='pan',
+            xaxis=dict(
+                rangeslider=dict(visible=True),
+                type='linear'
+            )
+        )
+        
+        # Create bar chart
+        df['Decade'] = (df['Year'] // 10) * 10
+        missions_per_decade = df.groupby('Decade').size().reset_index(name='Count')
+        bar_fig = px.bar(missions_per_decade, x='Decade', y='Count',
+                         title='NASA Missions per Decade',
+                         labels={'Decade': 'Decade', 'Count': 'Number of Missions'})
+        
+        bar_fig.update_layout(
+            title=dict(text='NASA Missions per Decade', font=dict(size=16), x=0.5, xanchor='center'),
+            xaxis_title='Decade',
+            yaxis_title='Number of Missions',
+            dragmode='pan'
+        )
+        
+        # Combine both charts
+        fig = make_subplots(rows=2, cols=1, subplot_titles=('NASA Mission Launch Years', 'NASA Missions per Decade'))
+        for trace in scatter_fig.data:
+            fig.add_trace(trace, row=1, col=1)
+        for trace in bar_fig.data:
+            fig.add_trace(trace, row=2, col=1)
+        
+        fig.update_layout(height=1000, showlegend=True, hovermode='closest')
+        
+        # Add reset zoom button
+        fig.update_layout(
+            updatemenus=[
+                dict(
+                    type="button",
+                    direction="left",
+                    buttons=[
+                        dict(
+                            args=[{"xaxis.range": None, "yaxis.range": None}],
+                            label="Reset Zoom",
+                            method="relayout"
+                        )
+                    ],
+                    pad={"r": 10, "t": 10},
+                    showactive=False,
+                    x=0.11,
+                    xanchor="left",
+                    y=1.1,
+                    yanchor="top"
+                )
+            ]
         )
         
         chart_json = json.dumps(fig.to_dict(), default=serialize_numpy)
