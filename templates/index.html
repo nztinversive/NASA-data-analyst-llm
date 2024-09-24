@@ -4,38 +4,49 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>NASA Data Analysis Plugin</title>
+    <!-- Link to external CSS file for styling -->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <!-- Include Plotly.js library for interactive charts -->
     <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
 </head>
 <body>
     <header>
+        <!-- Display NASA logo -->
         <img src="{{ url_for('static', filename='img/nasa_logo.svg') }}" alt="NASA Logo" class="nasa-logo">
         <h1>NASA Data Analysis Plugin</h1>
     </header>
     
     <main>
+        <!-- Form for user to input queries -->
         <form id="query-form">
             <label for="query">Enter your query:</label>
             <input type="text" id="query" name="query" required>
+            <!-- Button for standard analysis -->
             <button type="submit" id="analyze-btn">Analyze</button>
+            <!-- Button for advanced analysis (likely using LLaMA model) -->
             <button type="button" id="advanced-analyze-btn">Advanced Analyze</button>
         </form>
 
+        <!-- Section to display query suggestions -->
         <div id="suggestions">
             <h3>Suggested Queries:</h3>
             <ul>
+                <!-- Loop through suggestions passed from the backend -->
                 {% for suggestion in suggestions %}
                 <li><a href="#" class="suggestion">{{ suggestion }}</a></li>
                 {% endfor %}
             </ul>
         </div>
 
+        <!-- Containers for displaying analysis results and charts -->
         <div id="result" style="display: none;"></div>
         <div id="chart" style="display: none;"></div>
 
+        <!-- Container for displaying query history -->
         <div id="history"></div>
     </main>
 
+    <!-- Link to external JavaScript file for interactive functionality -->
     <script src="{{ url_for('static', filename='js/script.js') }}"></script>
 </body>
 </html>
