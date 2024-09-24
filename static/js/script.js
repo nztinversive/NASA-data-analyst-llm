@@ -7,6 +7,9 @@ document.addEventListener('DOMContentLoaded', function() {
     const analyzeBtn = document.getElementById('analyze-btn');
     const advancedAnalyzeBtn = document.getElementById('advanced-analyze-btn');
 
+    let currentPage = 1;
+    const itemsPerPage = 10;
+
     form.addEventListener('submit', function(e) {
         e.preventDefault();
         const query = document.getElementById('query').value;
@@ -83,7 +86,6 @@ document.addEventListener('DOMContentLoaded', function() {
             modeBarButtonsToAdd: ['zoom2d', 'pan2d', 'select2d', 'lasso2d', 'zoomIn2d', 'zoomOut2d', 'autoScale2d', 'resetScale2d']
         });
 
-        // Add color customization
         addColorCustomization(parsedChartData);
 
         function resizeChart() {
@@ -134,7 +136,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function loadQueryHistory() {
-        fetch('/history')
+        fetch(`/history?page=${currentPage}&per_page=${itemsPerPage}`)
         .then(response => response.json())
         .then(data => {
             historyDiv.innerHTML = '<h2>Query History:</h2>';
@@ -145,6 +147,30 @@ document.addEventListener('DOMContentLoaded', function() {
                 ul.appendChild(li);
             });
             historyDiv.appendChild(ul);
+
+            // Add pagination controls
+            const paginationDiv = document.createElement('div');
+            paginationDiv.className = 'pagination';
+            
+            const prevButton = document.createElement('button');
+            prevButton.textContent = 'Previous';
+            prevButton.addEventListener('click', () => {
+                if (currentPage > 1) {
+                    currentPage--;
+                    loadQueryHistory();
+                }
+            });
+            
+            const nextButton = document.createElement('button');
+            nextButton.textContent = 'Next';
+            nextButton.addEventListener('click', () => {
+                currentPage++;
+                loadQueryHistory();
+            });
+            
+            paginationDiv.appendChild(prevButton);
+            paginationDiv.appendChild(nextButton);
+            historyDiv.appendChild(paginationDiv);
         })
         .catch(error => {
             historyDiv.innerHTML = '<p class="error">Failed to load query history</p>';
