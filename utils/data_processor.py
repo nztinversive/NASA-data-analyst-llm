@@ -103,7 +103,7 @@ def process_query(query: str) -> Union[List, Dict]:
         fig.update_layout(
             updatemenus=[
                 dict(
-                    type="button",
+                    type="buttons",
                     direction="left",
                     buttons=[
                         dict(
