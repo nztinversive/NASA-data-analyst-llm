@@ -76,79 +76,15 @@ document.addEventListener('DOMContentLoaded', function() {
         chartDiv.style.display = 'block';
         const parsedChartData = JSON.parse(chartData);
         
-        // Create a responsive layout
-        const layout = {
-            autosize: true,
-            margin: { l: 50, r: 30, b: 50, t: 50, pad: 4 },
-            updatemenus: parsedChartData[0].layout.updatemenus
-        };
-
-        // Create the plot with all chart types
-        Plotly.newPlot('chart', parsedChartData.map(chart => chart.data).flat(), layout, {
-            scrollZoom: true,
-            editable: true,
-            modeBarButtonsToAdd: ['hoverClosestGl2d', 'toggleSpikelines', 'resetScale2d'],
+        Plotly.newPlot('chart', parsedChartData.data, parsedChartData.layout, {
             responsive: true
         });
 
-        // Add event listener for button clicks
-        parsedChartData[0].layout.updatemenus[0].buttons.forEach((button, index) => {
-            button.click = function() {
-                Plotly.update('chart', 
-                    {'visible': parsedChartData.map((_, i) => i === index).map(v => v ? true : 'legendonly')},
-                    {'title': parsedChartData[index].layout.title}
-                );
-            };
-        });
-
-        // Make the chart responsive
         function resizeChart() {
-            const chartContainer = document.getElementById('chart');
-            Plotly.relayout('chart', {
-                width: chartContainer.clientWidth,
-                height: Math.max(300, window.innerHeight * 0.6)
-            });
+            Plotly.Plots.resize('chart');
         }
 
         window.addEventListener('resize', resizeChart);
-        resizeChart();
-
-        // Add color customization
-        addColorCustomization(parsedChartData);
-    }
-
-    function addColorCustomization(parsedChartData) {
-        const colorSchemes = {
-            'Default': {'Completed': '#1f77b4', 'Ongoing': '#ff7f0e'},
-            'High Contrast': {'Completed': '#000000', 'Ongoing': '#ff0000'},
-            'Pastel': {'Completed': '#b3e2cd', 'Ongoing': '#fdcdac'}
-        };
-
-        const colorSchemeSelect = document.createElement('select');
-        colorSchemeSelect.id = 'color-scheme-select';
-        Object.keys(colorSchemes).forEach(scheme => {
-            const option = document.createElement('option');
-            option.value = scheme;
-            option.textContent = scheme;
-            colorSchemeSelect.appendChild(option);
-        });
-
-        const colorSchemeLabel = document.createElement('label');
-        colorSchemeLabel.htmlFor = 'color-scheme-select';
-        colorSchemeLabel.textContent = 'Color Scheme: ';
-
-        const colorSchemeContainer = document.createElement('div');
-        colorSchemeContainer.appendChild(colorSchemeLabel);
-        colorSchemeContainer.appendChild(colorSchemeSelect);
-
-        chartDiv.insertBefore(colorSchemeContainer, chartDiv.firstChild);
-
-        colorSchemeSelect.addEventListener('change', function() {
-            const selectedScheme = colorSchemes[this.value];
-            Plotly.restyle('chart', {
-                'marker.color': [parsedChartData[0].data.map(trace => selectedScheme[trace.name] || trace.marker.color)]
-            });
-        });
     }
 
     function showError(message) {
